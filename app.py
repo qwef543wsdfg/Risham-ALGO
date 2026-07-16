@@ -12,7 +12,7 @@ from config import (
     STOCK_SYMBOL,
     validate_config,
 )
-from market_data import generate_mock_price
+from core.market_data import generate_mock_price
 from signal_manager import (
     is_duplicate_signal,
     read_recent_signals,
