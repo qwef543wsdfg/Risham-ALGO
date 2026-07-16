@@ -18,7 +18,7 @@ from signal_manager import (
     read_recent_signals,
     save_signal,
 )
-from strategy import generate_signal
+from core.strategy import generate_signal
 
 from pnl import calculate_portfolio_metrics
 from portfolio import load_portfolio
