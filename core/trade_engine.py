@@ -11,10 +11,10 @@ from datetime import datetime
 from pathlib import Path
 
 from config import STOCK_SYMBOL, TRADES_FILE_PATH
-from portfolio import load_portfolio, save_portfolio
+from core.portfolio import load_portfolio, save_portfolio
 
 
-from risk_manager import (
+from core.risk_manager import (
     calculate_buy_quantity,
     calculate_stop_loss_price,
     validate_sell_quantity,

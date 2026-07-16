@@ -5,7 +5,7 @@ Streamlit dashboard for the Algo Trading V2 project.
 from datetime import datetime
 
 import streamlit as st
-from price_history import save_price
+from core.price_history import save_price
 
 from config import (
     PRICE_UPDATE_INTERVAL,
@@ -13,16 +13,16 @@ from config import (
     validate_config,
 )
 from core.market_data import generate_mock_price
-from signal_manager import (
+from core.signal_manager import (
     is_duplicate_signal,
     read_recent_signals,
     save_signal,
 )
 from core.strategy import generate_signal
 
-from pnl import calculate_portfolio_metrics
-from portfolio import load_portfolio
-from trade_engine import execute_signal
+from core.pnl import calculate_portfolio_metrics
+from core.portfolio import load_portfolio
+from core.trade_engine import execute_signal
 
 st.set_page_config(
     page_title="Algo Trading V2",
