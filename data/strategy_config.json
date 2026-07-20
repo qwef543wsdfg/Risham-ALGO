@@ -1,12 +1,12 @@
 {
-    "strategy_name": "Threshold Strategy",
-    "symbol": "MOCKSTOCK",
-    "timeframe": "1 Minute",
-    "buy_threshold": 105.0,
-    "sell_threshold": 95.0,
-    "stop_loss_percent": 2.0,
-    "target_percent": 4.0,
-    "risk_per_trade_percent": 1.0,
-    "max_position_size_percent": 20.0,
+    "strategy_name": "ASFGN",
+    "symbol": "SCOK",
+    "timeframe": "1 Day",
+    "buy_threshold": 119.0,
+    "sell_threshold": 94.0,
+    "stop_loss_percent": 2.3,
+    "target_percent": 4.3,
+    "risk_per_trade_percent": 0.8,
+    "max_position_size_percent": 12.5,
     "enabled": true
 }

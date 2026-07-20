@@ -3,7 +3,7 @@ Main Streamlit dashboard for Algo Trading V2.
 """
 
 from datetime import datetime
-
+from ui.strategy_page import show_strategy_page
 import streamlit as st
 
 from config import PRICE_UPDATE_INTERVAL, STOCK_SYMBOL
@@ -24,42 +24,59 @@ from ui.tables import show_signal_table
 from ui.theme import apply_theme
 
 
-def show_dashboard_header() -> None:
-    """Display the main dashboard header."""
-
-    st.markdown(
-        f"""
-<div class="algo-header">
-    <div>
-        <div class="algo-title">📈 Risham Algo V2</div>
-        <div class="algo-subtitle">
-            Paper Trading Dashboard · {STOCK_SYMBOL}
-        </div>
-    </div>
-
-    <div class="live-badge">
-        <span class="live-dot"></span>
-        SYSTEM LIVE
-    </div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
 def get_chart_prices(limit: int = 50) -> list[float]:
-    """Read valid numeric prices from price-history storage."""
+    """
+    Read saved price-history rows and return valid numeric prices.
+    """
 
-    history = read_price_history(limit)
+    price_rows = read_price_history(limit)
     prices: list[float] = []
 
-    for row in history:
+    for row in price_rows:
         try:
-            prices.append(float(row["price"]))
+            price = float(row["price"])
+
+            if price > 0:
+                prices.append(price)
+
         except (KeyError, TypeError, ValueError):
             continue
 
     return prices
+
+
+
+def show_dashboard() -> None:
+    """
+    Render dashboard navigation and the selected page.
+    """
+
+    apply_theme()
+    show_dashboard_header()
+
+    selected_page = st.radio(
+        "Main Navigation",
+        options=[
+            "Dashboard",
+            "Strategy Builder",
+        ],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="main_navigation",
+    )
+
+    st.markdown("<hr/>", unsafe_allow_html=True)
+
+    if selected_page == "Dashboard":
+        st.info(
+            "Mock-market paper trading environment. "
+            "No real broker orders are placed."
+        )
+
+        show_live_signal()
+        return
+
+    show_strategy_page()
 
 
 @st.fragment(run_every=PRICE_UPDATE_INTERVAL)
@@ -176,15 +193,24 @@ def show_live_signal() -> None:
         show_signal_table(recent_signals)
 
 
-def show_dashboard() -> None:
-    """Render the complete dashboard."""
+def show_dashboard_header() -> None:
+    """Render the dashboard header used by pages."""
 
-    apply_theme()
-    show_dashboard_header()
+    st.markdown(
+        f"""
+<div class="algo-header">
+    <div>
+        <div class="algo-title">📈 Risham Algo V2</div>
+        <div class="algo-subtitle">
+            Paper Trading Dashboard · {STOCK_SYMBOL}
+        </div>
+    </div>
 
-    st.info(
-        "Mock-market paper trading environment. "
-        "No real broker orders are placed."
+    <div class="live-badge">
+        <span class="live-dot"></span>
+        SYSTEM LIVE
+    </div>
+</div>
+""",
+        unsafe_allow_html=True,
     )
-
-    show_live_signal()
