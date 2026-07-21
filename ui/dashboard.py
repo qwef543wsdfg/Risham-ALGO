@@ -3,7 +3,8 @@ Main Streamlit dashboard for Algo Trading V2.
 """
 
 from datetime import datetime
-from ui.strategy_page import show_strategy_page
+from textwrap import dedent
+
 import streamlit as st
 
 from config import PRICE_UPDATE_INTERVAL, STOCK_SYMBOL
@@ -20,6 +21,8 @@ from core.strategy import generate_signal
 from core.trade_engine import execute_signal
 from ui.charts import show_price_chart
 from ui.metrics import show_top_metrics
+from ui.sidebar import show_sidebar
+from ui.strategy_page import show_strategy_page
 from ui.tables import show_signal_table
 from ui.theme import apply_theme
 
@@ -45,49 +48,86 @@ def get_chart_prices(limit: int = 50) -> list[float]:
     return prices
 
 
-
 def show_dashboard() -> None:
     """
-    Render dashboard navigation and the selected page.
+    Render the selected application page.
     """
 
     apply_theme()
+
+    selected_page = show_sidebar()
+
     show_dashboard_header()
 
-    selected_page = st.radio(
-        "Main Navigation",
-        options=[
-            "Dashboard",
-            "Strategy Builder",
-        ],
-        horizontal=True,
-        label_visibility="collapsed",
-        key="main_navigation",
-    )
-
-    st.markdown("<hr/>", unsafe_allow_html=True)
-
-    if selected_page == "Dashboard":
-        st.info(
-            "Mock-market paper trading environment. "
-            "No real broker orders are placed."
-        )
-
+    if selected_page == "📊 Dashboard":
         show_live_signal()
         return
 
-    show_strategy_page()
+    if selected_page == "📈 Live Trading":
+        st.title("Live Trading")
+
+        st.info(
+            "Live trading controls will be added in the next phase."
+        )
+        return
+
+    if selected_page == "🧠 Strategy Builder":
+        show_strategy_page()
+        return
+
+    if selected_page == "💼 Portfolio":
+        st.title("Portfolio")
+
+        st.info(
+            "Portfolio information will be added in the next phase."
+        )
+        return
+
+    if selected_page == "📜 Trades":
+        st.title("Trade History")
+
+        st.info(
+            "Complete trade history will be added in the next phase."
+        )
+        return
+
+    if selected_page == "📊 Analytics":
+        st.title("Analytics")
+
+        st.info(
+            "Strategy and portfolio analytics will be added later."
+        )
+        return
+
+    if selected_page == "⚙️ Settings":
+        st.title("Settings")
+
+        st.info(
+            "Application settings will be added later."
+        )
+        return
+
+    st.title("About Risham Algo")
+
+    st.write(
+        "Risham Algo V2 is a mock-market paper-trading "
+        "and strategy-testing application."
+    )
 
 
 @st.fragment(run_every=PRICE_UPDATE_INTERVAL)
 def show_live_signal() -> None:
-    """Generate and display the refreshed paper-trading dashboard."""
+    """
+    Generate and display the refreshed paper-trading dashboard.
+    """
 
     price: float = generate_mock_price()
     signal: str = generate_signal(price)
-    update_time: str = datetime.now().strftime("%I:%M:%S %p")
 
-    # Save every generated price for the chart.
+    update_time: str = datetime.now().strftime(
+        "%I:%M:%S %p"
+    )
+
     price_saved: bool = save_price(price)
 
     duplicate: bool = is_duplicate_signal(
@@ -95,11 +135,12 @@ def show_live_signal() -> None:
         signal,
     )
 
+    signal_saved = False
     trade_message = ""
     trade_success: bool | None = None
 
     if not duplicate:
-        signal_saved: bool = save_signal(
+        signal_saved = save_signal(
             STOCK_SYMBOL,
             price,
             signal,
@@ -114,8 +155,6 @@ def show_live_signal() -> None:
                 signal=signal,
                 price=price,
             )
-    else:
-        signal_saved = False
 
     portfolio, portfolio_message = load_portfolio()
 
@@ -128,56 +167,73 @@ def show_live_signal() -> None:
             portfolio=portfolio,
             current_price=price,
         )
+
     except (KeyError, TypeError, ValueError) as error:
         st.error(
             f"Portfolio metrics could not be calculated: {error}"
         )
         return
 
-    realized_pnl = float(
-        portfolio.get("realized_pnl", 0.0)
-    )
+    try:
+        quantity = int(
+            portfolio.get("quantity", 0)
+        )
 
-    unrealized_pnl = float(
-        metrics.get("unrealized_pnl", 0.0)
-    )
+        realized_pnl = float(
+            portfolio.get("realized_pnl", 0.0)
+        )
+
+        cash = float(
+            metrics.get("cash", 0.0)
+        )
+
+        total_equity = float(
+            metrics.get("total_equity", 0.0)
+        )
+
+        unrealized_pnl = float(
+            metrics.get("unrealized_pnl", 0.0)
+        )
+
+    except (TypeError, ValueError) as error:
+        st.error(
+            f"Portfolio values are invalid: {error}"
+        )
+        return
 
     total_pnl = realized_pnl + unrealized_pnl
-
-    st.subheader("Live Signal")
 
     show_top_metrics(
         current_price=price,
         signal=signal,
-        quantity=int(portfolio["quantity"]),
-        cash=float(metrics["cash"]),
-        total_equity=float(metrics["total_equity"]),
+        quantity=quantity,
+        cash=cash,
+        total_equity=total_equity,
         total_pnl=total_pnl,
+    )
+
+    status_message = get_status_message(
+        duplicate=duplicate,
+        signal_saved=signal_saved,
+        trade_success=trade_success,
+        trade_message=trade_message,
     )
 
     st.caption(
         f"Last updated: {update_time} · "
-        f"Refresh interval: {PRICE_UPDATE_INTERVAL} seconds"
+        f"Refresh interval: {PRICE_UPDATE_INTERVAL} seconds · "
+        f"{status_message}"
     )
 
-    if duplicate:
-        st.info(
-            "Signal unchanged. Duplicate signal was not saved."
-        )
-    elif signal_saved:
-        st.success("New signal saved successfully.")
-    else:
-        st.error("Signal could not be saved.")
-
-    if trade_success is True:
-        st.success(trade_message)
-    elif trade_success is False:
-        st.warning(trade_message)
-
     if not price_saved:
-        st.warning("Current price could not be saved to history.")
+        st.warning(
+            "Current price could not be saved to history."
+        )
 
-    st.markdown("<hr/>", unsafe_allow_html=True)
+    st.markdown(
+        "<hr/>",
+        unsafe_allow_html=True,
+    )
 
     left_column, right_column = st.columns(
         [1.5, 1.0],
@@ -185,32 +241,96 @@ def show_live_signal() -> None:
     )
 
     with left_column:
-        price_history = get_chart_prices(50)
+        price_history = get_chart_prices(
+            limit=50
+        )
+
         show_price_chart(price_history)
 
     with right_column:
-        recent_signals = read_recent_signals(8)
+        recent_signals = read_recent_signals(
+            8
+        )
+
         show_signal_table(recent_signals)
 
 
+def get_status_message(
+    duplicate: bool,
+    signal_saved: bool,
+    trade_success: bool | None,
+    trade_message: str,
+) -> str:
+    """
+    Return a short dashboard status message.
+    """
+
+    if trade_message:
+        return trade_message
+
+    if trade_success is True:
+        return "Trade executed successfully"
+
+    if trade_success is False:
+        return "Trade was not executed"
+
+    if duplicate:
+        return "Signal unchanged"
+
+    if signal_saved:
+        return "New signal saved"
+
+    return "Signal could not be saved"
+
+
 def show_dashboard_header() -> None:
-    """Render the dashboard header used by pages."""
+    """
+    Render the professional dashboard header.
+    """
+
+    current_time = datetime.now().strftime(
+        "%I:%M:%S %p"
+    )
+
+    header_html = dedent(
+        f"""
+        <div class="dashboard-header">
+            <div class="dashboard-header-left">
+                <div class="dashboard-brand-row">
+                    <div class="dashboard-logo">R</div>
+                    <div class="dashboard-heading-content">
+                        <div class="dashboard-title">
+                            RISHAM ALGO TERMINAL
+                        </div>
+                        <div class="dashboard-subtitle">
+                            Institutional Paper Trading Platform
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-header-right">
+                <div class="running-status">
+                    <span class="running-dot"></span>
+                    <span>System Running</span>
+                </div>
+                <div class="mode-badge">
+                    Paper Trading
+                </div>
+                <div class="last-updated">
+                    {current_time}
+                </div>
+            </div>
+        </div>
+        """
+    ).strip()
+
+    compact_header_html = "".join(
+        line.strip()
+        for line in header_html.splitlines()
+        if line.strip()
+    )
 
     st.markdown(
-        f"""
-<div class="algo-header">
-    <div>
-        <div class="algo-title">📈 Risham Algo V2</div>
-        <div class="algo-subtitle">
-            Paper Trading Dashboard · {STOCK_SYMBOL}
-        </div>
-    </div>
-
-    <div class="live-badge">
-        <span class="live-dot"></span>
-        SYSTEM LIVE
-    </div>
-</div>
-""",
+        compact_header_html,
         unsafe_allow_html=True,
     )

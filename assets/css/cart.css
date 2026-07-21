@@ -1,0 +1,427 @@
+/* =========================================================
+   Risham Algo Terminal
+   Plotly Live Price Chart
+   ========================================================= */
+
+.plotly-chart-header {
+    min-height: 78px;
+    padding: 1rem 1.05rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    border: 1px solid rgba(148, 163, 184, 0.13);
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(15, 25, 41, 0.98),
+            rgba(8, 17, 31, 0.98)
+        );
+}
+
+.plotly-chart-heading {
+    flex-shrink: 0;
+}
+
+.plotly-chart-stats {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+}
+
+.plotly-chart-stat {
+    min-width: 78px;
+    padding: 0.55rem 0.7rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+
+    border: 1px solid rgba(148, 163, 184, 0.11);
+    border-radius: 9px;
+
+    background: rgba(148, 163, 184, 0.035);
+}
+
+.plotly-chart-stat span {
+    color: #64748b;
+    font-size: 0.58rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.plotly-chart-stat strong {
+    color: #dce5f2;
+    font-size: 0.74rem;
+    font-weight: 750;
+}
+
+.plotly-current-price {
+    min-width: 138px;
+    padding: 0.52rem 0.75rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+
+    border: 1px solid transparent;
+    border-radius: 9px;
+}
+
+.plotly-current-price span {
+    font-size: 0.56rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.plotly-current-price strong {
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.plotly-current-price small {
+    font-size: 0.58rem;
+    font-weight: 700;
+}
+
+.plotly-current-price.price-positive {
+    border-color: rgba(34, 201, 122, 0.20);
+    background: rgba(34, 201, 122, 0.075);
+    color: #2bd486;
+}
+
+.plotly-current-price.price-negative {
+    border-color: rgba(255, 92, 117, 0.20);
+    background: rgba(255, 92, 117, 0.075);
+    color: #ff6d83;
+}
+
+.plotly-current-price.price-neutral {
+    border-color: rgba(148, 163, 184, 0.18);
+    background: rgba(148, 163, 184, 0.06);
+    color: #cbd5e1;
+}
+
+/* Plotly container */
+
+[data-testid="stPlotlyChart"] {
+    width: 100%;
+
+    margin: 0 !important;
+    padding: 0.35rem 0.45rem 0.1rem;
+
+    border-right: 1px solid rgba(148, 163, 184, 0.13);
+    border-left: 1px solid rgba(148, 163, 184, 0.13);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(8, 17, 31, 0.98),
+            rgba(7, 15, 27, 0.98)
+        );
+}
+
+[data-testid="stPlotlyChart"] > div {
+    width: 100% !important;
+}
+
+[data-testid="stPlotlyChart"] .js-plotly-plot,
+[data-testid="stPlotlyChart"] .plot-container,
+[data-testid="stPlotlyChart"] .svg-container {
+    width: 100% !important;
+}
+
+/* Plotly toolbar */
+
+[data-testid="stPlotlyChart"] .modebar {
+    top: 8px !important;
+    right: 8px !important;
+
+    padding: 0.25rem !important;
+
+    border: 1px solid rgba(148, 163, 184, 0.11);
+    border-radius: 8px;
+
+    background: rgba(8, 17, 31, 0.88) !important;
+    backdrop-filter: blur(10px);
+}
+
+[data-testid="stPlotlyChart"] .modebar-btn {
+    opacity: 0.55;
+}
+
+[data-testid="stPlotlyChart"] .modebar-btn:hover {
+    opacity: 1;
+}
+
+/* Footer */
+
+.plotly-chart-footer {
+    min-height: 42px;
+    padding: 0.66rem 1rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    border: 1px solid rgba(148, 163, 184, 0.13);
+    border-top: 1px solid rgba(148, 163, 184, 0.08);
+    border-radius: 0 0 14px 14px;
+
+    background: rgba(7, 15, 27, 0.98);
+
+    color: #64748b;
+    font-size: 0.64rem;
+}
+
+.plotly-live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    color: #22c97a;
+    font-weight: 700;
+}
+
+.plotly-live-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #22c97a;
+
+    box-shadow:
+        0 0 8px rgba(34, 201, 122, 0.65);
+
+    animation:
+        plotly-live-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes plotly-live-pulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.45;
+        transform: scale(0.84);
+    }
+}
+
+/* Empty state */
+
+.plotly-chart-empty {
+    min-height: 430px;
+    padding: 2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    border: 1px solid rgba(148, 163, 184, 0.13);
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(15, 25, 41, 0.98),
+            rgba(8, 17, 31, 0.98)
+        );
+
+    text-align: center;
+}
+
+.plotly-chart-empty-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.9rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(91, 124, 255, 0.20);
+    border-radius: 13px;
+
+    background: rgba(91, 124, 255, 0.08);
+
+    color: #8398ff;
+    font-size: 1.3rem;
+}
+
+.plotly-chart-empty-title {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 750;
+}
+
+.plotly-chart-empty-text {
+    max-width: 280px;
+    margin-top: 0.4rem;
+
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.55;
+}
+
+/* Remove Streamlit spacing */
+
+[data-testid="stMarkdownContainer"]:has(.plotly-chart-header) p,
+[data-testid="stMarkdownContainer"]:has(.plotly-chart-footer) p {
+    margin: 0;
+}
+
+/* Responsive */
+
+@media (max-width: 850px) {
+    .plotly-chart-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .plotly-chart-stats {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 600px) {
+    .plotly-chart-stat,
+    .plotly-current-price {
+        flex: 1;
+        min-width: 110px;
+    }
+
+    .plotly-chart-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+}
+
+
+
+/* =========================================================
+   Phase 2.4 — Institutional Plotly Chart Polish
+   ========================================================= */
+
+[data-testid="stPlotlyChart"] {
+    overflow: hidden;
+
+    padding:
+        0.35rem
+        0.35rem
+        0.15rem;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(79, 109, 245, 0.055),
+            transparent 42%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(7, 16, 30, 0.99),
+            rgba(6, 14, 26, 0.99)
+        );
+}
+
+[data-testid="stPlotlyChart"] .modebar {
+    opacity: 0.25;
+
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+}
+
+[data-testid="stPlotlyChart"]:hover .modebar {
+    opacity: 0.95;
+}
+
+[data-testid="stPlotlyChart"] .modebar-btn {
+    border-radius: 5px;
+
+    transition:
+        background-color 150ms ease,
+        opacity 150ms ease;
+}
+
+[data-testid="stPlotlyChart"] .modebar-btn:hover {
+    background: rgba(91, 124, 255, 0.12);
+}
+
+.plotly-chart-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.plotly-chart-header::after {
+    position: absolute;
+    right: -60px;
+    top: -80px;
+
+    width: 190px;
+    height: 190px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(79, 109, 245, 0.08),
+            transparent 70%
+        );
+
+    content: "";
+    pointer-events: none;
+}
+
+.plotly-current-price {
+    position: relative;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.025),
+        0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.plotly-current-price.price-positive {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 0 22px rgba(34, 201, 122, 0.06);
+}
+
+.plotly-current-price.price-negative {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 0 22px rgba(255, 92, 117, 0.06);
+}
+
+.plotly-chart-footer {
+    backdrop-filter: blur(12px);
+}
+
+@media (max-width: 1100px) {
+    [data-testid="stPlotlyChart"] {
+        min-height: 450px;
+    }
+}
+
+@media (max-width: 700px) {
+    [data-testid="stPlotlyChart"] {
+        min-height: 390px;
+    }
+}
