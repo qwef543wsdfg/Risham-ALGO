@@ -1,4 +1,4 @@
-# Algo Trading V1
+# Risham Algo 
 
 A beginner-friendly mock algo trading signal dashboard built with Python and Streamlit.
 
